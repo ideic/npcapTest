@@ -6,6 +6,9 @@
 #include <string>
 #include <tchar.h>
 #include <iostream>
+#include <vector>
+#include "NpCapFile.h"
+#include <algorithm>
 
 NpCapReader::NpCapReader()
 {
@@ -67,6 +70,35 @@ void NpCapReader::ReadFile(std::string fileName)
 
 	// clean up
 	pcap_close(pcap);
+}
+
+bool NpCapReader::Compare(std::initializer_list<std::string> files)
+{
+	if (!LoadNpcapDlls())
+	{
+		std::cerr << "Couldn't load Npcap\n" << std::endl;
+		return false;
+	}
+
+	std::vector<NpCapFile> npcapFiles;
+
+	std::for_each(begin(files), end(files), [&](const auto &file) {
+		npcapFiles.emplace_back(NpCapFile(file));
+	});
+
+	std::for_each(begin(npcapFiles), end(npcapFiles), [&](NpCapFile &npcapFile) {
+		npcapFile.PrepareForRead();
+	});
+
+
+
+
+
+	std::for_each(begin(npcapFiles), end(npcapFiles), [&](auto &reader) {
+		reader.FinishRead();
+	});
+
+	return false;
 }
 
 bool NpCapReader::LoadNpcapDlls()

@@ -155,10 +155,12 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClInclude Include="NpCapFile.h" />
     <ClInclude Include="NpCapReader.h" />
     <ClInclude Include="pch.h" />
   </ItemGroup>
   <ItemGroup>
+    <ClCompile Include="NpCapFile.cpp" />
     <ClCompile Include="NpCapReader.cpp" />
     <ClCompile Include="NpCapTest.cpp" />
     <ClCompile Include="pch.cpp">
