@@ -82,7 +82,7 @@ bool NpCapReader::Compare(std::initializer_list<std::string> files)
 		bpf_u_int32 size1, size2;
 
 	
-		if ( npcapFiles[i].NextData(&pkt_data1, size1) && npcapFiles[i+1].NextData(&pkt_data2, size2)){
+		while ( npcapFiles[i].NextData(&pkt_data1, size1) && npcapFiles[i+1].NextData(&pkt_data2, size2)){
 			if (size1 != size2 || memcmp(pkt_data1, pkt_data2, size1)) {
 				result = false;
 				break;
