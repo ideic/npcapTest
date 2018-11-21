@@ -28,7 +28,9 @@ bool NpCapFile::PrepareForRead()
 	char errbuf[PCAP_ERRBUF_SIZE];
 
 	pcap = { pcap_open_offline(file.c_str(), errbuf), [](auto *pcapParam) {
-		pcap_close(pcapParam); } };
+		std::cout << "Close Pcap" << std::endl;
+		pcap_close(pcapParam); 
+	} };
 
 	if (pcap.get() == nullptr) {
 		std::cerr << "Error opening stream from :" << errbuf << std::endl;
@@ -40,7 +42,7 @@ bool NpCapFile::PrepareForRead()
 
 void NpCapFile::FinishRead()
 {
-	pcap.release();
+	pcap.reset();
 }
 
 const bool NpCapFile::NextData(const u_char **pkt_data, bpf_u_int32 &size)
