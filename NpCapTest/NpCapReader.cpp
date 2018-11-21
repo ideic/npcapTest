@@ -72,6 +72,8 @@ bool NpCapReader::Compare(std::initializer_list<std::string> files)
 
 	std::for_each(begin(npcapFiles), end(npcapFiles), [&](NpCapFile &npcapFile) {
 		npcapFile.PrepareForRead();
+		//npcapFile.SetFilter("tcp port 80");
+
 	});
 
 	auto result = true;

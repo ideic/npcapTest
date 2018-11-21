@@ -15,6 +15,7 @@ public:
 	bool PrepareForRead();
 	void FinishRead();
 	const bool NextData(const u_char **pkt_data, bpf_u_int32 &size);
+	bool SetFilter(std::string filter);
 
 private:
 	std::string file{};

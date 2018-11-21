@@ -60,3 +60,24 @@ const bool NpCapFile::NextData(const u_char **pkt_data, bpf_u_int32 &size)
 	}
 	return false;
 }
+
+bool NpCapFile::SetFilter(std::string filter)
+{
+	bpf_u_int32 NetMask = 0xffffff;
+	struct bpf_program fcode;
+
+	//compile the filter
+	if (pcap_compile(pcap.get(), &fcode, filter.c_str(), 1, NetMask) < 0)
+	{
+		std::cerr << "Error compiling filter: wrong syntax." << std::endl;
+		return false;
+	}
+
+	//set the filter
+	if (pcap_setfilter(pcap.get(), &fcode) < 0)
+	{
+		std::cerr << "Error setting the filter" << std::endl;
+		return false;
+	}
+	return false;
+}
