@@ -27,23 +27,7 @@ void NpCapReader::ReadFile(std::string fileName)
 		return;
 	}
 
-	//char source[PCAP_BUF_SIZE];
 	char errbuf[PCAP_ERRBUF_SIZE];
-
-
-	///*This function is required to create a source string that begins with a marker used to tell Npcap the type of the source, e.g. "rpcap://" if we are going to open an adapter, or "file://" if we are going to open a file.*/
-	///* Create the source string according to the new Npcap syntax */
-	//if (pcap_createsrcstr(source,			// variable that will keep the source string
-	//	PCAP_SRC_FILE,	// we want to open a file
-	//	NULL,			// remote host
-	//	NULL,			// port on the remote host
-	//	fileName,		// name of the file we want to open
-	//	errbuf			// error buffer
-	//) != 0)
-	//{
-	//	std:cerr << "\nError creating a source string\n" << std :: endl;
-	//	return;
-	//}
 
 	pcap_t *pcap = pcap_open_offline(fileName.c_str(), errbuf);
 
@@ -59,7 +43,7 @@ void NpCapReader::ReadFile(std::string fileName)
 	while ((res = pcap_next_ex(pcap, &header, &pkt_data)) >= 0)
 	{
 		/* print pkt timestamp and pkt len */
-		std::cout << header->ts.tv_sec << ":"<< header->ts.tv_usec << "len:" << header->len <<std::endl;
+		std::cout << header->ts.tv_sec << ":"<< header->ts.tv_usec << " header len:" << header->len  <<" capture Len:" << header->caplen <<std::endl;
 
 		///* Print the packet */
 		//for (u_int i = 1; (i < header->caplen + 1); i++)
@@ -90,15 +74,28 @@ bool NpCapReader::Compare(std::initializer_list<std::string> files)
 		npcapFile.PrepareForRead();
 	});
 
+	auto result = true;
+	for (size_t i = 0; i < npcapFiles.size()-1; ++i) {
+		const u_char *pkt_data1 = nullptr;
+		const u_char *pkt_data2 = nullptr;;
 
+		bpf_u_int32 size1, size2;
 
+	
+		if ( npcapFiles[i].NextData(&pkt_data1, size1) && npcapFiles[i+1].NextData(&pkt_data2, size2)){
+			if (size1 != size2 || memcmp(pkt_data1, pkt_data2, size1)) {
+				result = false;
+				break;
+			}
+		}
+	};
 
 
 	std::for_each(begin(npcapFiles), end(npcapFiles), [&](auto &reader) {
 		reader.FinishRead();
 	});
 
-	return false;
+	return result;
 }
 
 bool NpCapReader::LoadNpcapDlls()

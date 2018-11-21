@@ -41,3 +41,16 @@ void NpCapFile::FinishRead()
 {
 	pcap.release();
 }
+
+const bool NpCapFile::NextData(const u_char **pkt_data, bpf_u_int32 &size)
+{
+	struct pcap_pkthdr *header;
+	size = 0;
+
+	if ((pcap_next_ex(pcap.get(), &header, pkt_data)) >= 0)
+	{
+		size = header->caplen;
+		return true;
+	}
+	return false;
+}
